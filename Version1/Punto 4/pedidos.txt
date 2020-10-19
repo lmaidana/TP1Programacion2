@@ -1,9 +1,13 @@
 ------------------------------PEDIDOS------------------------------
-Email: juanmansi@gmail.com	Cant de prod: 2
-Nombre: JuanMansi	Total: 24
+Email: juanmansi@gmail.com	Cant de prod: 6
+Nombre: JuanMansi	Total: 44
 
 
-Email: mrotelli@gmail.com	Cant de prod: 6
-Nombre: MartinRotelli	Total: 114
+Email: manumouso@gmail.com	Cant de prod: 8
+Nombre: ManuelMousso	Total: 96
+
+
+Email: mrotelli@gmail.com	Cant de prod: 9
+Nombre: MartinRotelli	Total: 144
 
 

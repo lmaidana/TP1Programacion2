@@ -26,7 +26,7 @@ struct resumen
 };
 
 FILE *abrir(const char *archivo, const char *modo);
-resumen busqueda(FILE *archivo, pedido pedidos, usuario usuarios, FILE *pedidostxt);
+resumen busqueda(FILE *archivo, pedido pedidos, usuario usuarios);
 
 int main()
 {
@@ -36,21 +36,28 @@ int main()
   pedido pedidos;
   usuario usuarios;
   resumen resumenes;
-  char emailFlag[30];
-  fread(&pedidos, sizeof(pedido), 1, pedidosbin);
   fprintf(pedidostxt, "------------------------------PEDIDOS------------------------------\n");
+  fread(&pedidos, sizeof(pedido), 1, pedidosbin);
   while (!feof(pedidosbin))
   {
-    resumenes = busqueda(usersbin, pedidos, usuarios, pedidostxt);
-    strcpy(emailFlag, resumenes.email);
-    while (!feof(pedidosbin) && emailFlag == resumenes.email) //este while fue agregado luego de correcion
+    resumenes = busqueda(usersbin, pedidos, usuarios);
+    resumenes.cant = 0;
+    resumenes.total = 0;
+    if (strcmp(resumenes.email, "0") != 0) //acá verifico con el flag de la binaria si existe o no.
     {
-      resumenes.cant += resumenes.cant;
-      resumenes.total += resumenes.total;
-      fread(&pedidos, sizeof(pedido), 1, pedidosbin);
-      resumenes = busqueda(usersbin, pedidos, usuarios, pedidostxt);
+      while (strcmp(pedidos.email, resumenes.email) == 0 && !feof(pedidosbin))
+      {
+        resumenes.cant += pedidos.cant;
+        resumenes.total += (pedidos.cant * pedidos.valor);
+        fread(&pedidos, sizeof(pedido), 1, pedidosbin);
+      }
+      fprintf(pedidostxt, "Email: %s\tCant de prod: %d\nNombre: %s\tTotal: %d\n\n\n", resumenes.email, resumenes.cant, resumenes.nombre, resumenes.total); //Imprimo en el txt
+      fread(&pedidos, sizeof(pedido), -1, pedidosbin);
     }
-    fread(&pedidos, sizeof(pedido), 1, pedidosbin);
+    else
+    {
+      fread(&pedidos, sizeof(pedido), 1, pedidosbin);
+    }
   }
   fclose(pedidosbin);
   fclose(usersbin);
@@ -67,8 +74,9 @@ FILE *abrir(const char *archivo, const char *modo)
   }
   return file;
 }
-resumen busqueda(FILE *archivo, pedido pedidos, usuario usuarios, FILE *pedidostxt)
+resumen busqueda(FILE *archivo, pedido pedidos, usuario usuarios)
 {
+  char flag[2] = "0";
   resumen resumenes;
   int cantRegistros = 0;
   int centro = 0;
@@ -86,9 +94,6 @@ resumen busqueda(FILE *archivo, pedido pedidos, usuario usuarios, FILE *pedidost
     {
       strcpy(resumenes.email, usuarios.email);
       strcpy(resumenes.nombre, usuarios.nombre);
-      resumenes.cant = pedidos.cant;
-      resumenes.total = pedidos.valor * pedidos.cant;
-      fprintf(pedidostxt, "Email: %s\tCant de prod: %d\nNombre: %s\tTotal: %d\n\n\n", resumenes.email, resumenes.cant, resumenes.nombre, resumenes.total); //Imprimo en el txt
       return resumenes;
     }
     else if (strcmp(usuarios.email, pedidos.email) > 0)
@@ -101,4 +106,6 @@ resumen busqueda(FILE *archivo, pedido pedidos, usuario usuarios, FILE *pedidost
     }
   }
   printf("El correo %s no coincide !\n", pedidos.email); //Imprimo por consola los que no coinciden
+  strcpy(resumenes.email, flag);                         //Este flag es para saber si el usuario existe o no, así en el corte de controlo lo saltea o no.
+  return resumenes;
 }
