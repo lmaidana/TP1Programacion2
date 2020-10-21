@@ -69,7 +69,7 @@ int busqueda(FILE *acepta2, usuario elementoAbuscar, usuario unregistro)
   fseek(acepta2, 0, SEEK_SET);
   int inicio = ftell(acepta2);
   fseek(acepta2, 0, SEEK_END);
-  cantRegistros = (ftell(acepta2) / (sizeof(usuario)));
+  cantRegistros = (ftell(acepta2) / sizeof(usuario)) - 1;
   fseek(acepta2, 0, SEEK_SET);
   while (inicio <= cantRegistros)
   {
